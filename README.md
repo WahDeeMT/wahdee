@@ -1,5 +1,3 @@
-# Hi, I'm Mert 👋
-
 I'm a SaaS-focused frontend developer and product builder.
 
 ## 🚀 What I'm building
@@ -19,5 +17,3 @@ I'm a SaaS-focused frontend developer and product builder.
 ## 🌍 Live Projects
 - 🔗 wahdee-two.vercel.app
 
----
-💡 Always learning. Always building.
