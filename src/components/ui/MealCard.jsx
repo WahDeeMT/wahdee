@@ -5,34 +5,42 @@ import { cn } from '../../lib/utils';
 const MealCard = ({ title, items, color, hoverBorder, hoverShadow, totalCalories, onAdd, onRemove }) => {
   return (
     <div className={cn(
-      "rounded-2xl p-5 flex flex-col h-full transition-all duration-300 border border-gray-100/50 hover:shadow-xl hover:-translate-y-1 group",
-      color,
+      "rounded-[32px] p-6 flex flex-col h-full transition-all duration-300 border hover:shadow-2xl hover:-translate-y-2 group relative overflow-hidden bg-white shadow-sm",
+      "dark:bg-slate-800/40 dark:border-white/10 dark:shadow-none",
       hoverBorder,
       hoverShadow
-    )}>
-      <div className="flex justify-between items-start mb-4">
-        <h3 className="font-bold text-gray-800 text-lg tracking-tight">{title}</h3>
-        <div className="bg-white/60 backdrop-blur-sm px-2.5 py-1 rounded-lg text-xs font-bold text-gray-700 shadow-sm group-hover:bg-white/90 transition-all">
+    )}
+      style={{ borderTop: `4px solid ${color === 'bg-yellow-50' ? '#eab308' : color === 'bg-green-50' ? '#22c55e' : color === 'bg-gray-50' ? '#94a3b8' : '#ec4899'}` }}
+    >
+      {/* Background Accent Shimmer */}
+      <div className="absolute top-0 left-0 w-full h-1 bg-white/30 group-hover:bg-white/50 transition-colors" />
+      <div className="flex justify-between items-start mb-6">
+        <h3 className="font-black text-lg tracking-tight" style={{ color: 'var(--text-primary)' }}>{title}</h3>
+        <div className="backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-black shadow-sm group-hover:scale-110 transition-all border" style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-primary)', borderColor: 'var(--border-color)' }}>
           {totalCalories} kcal
         </div>
       </div>
 
       <div className="flex-1 space-y-3 mb-4">
         {items.length === 0 && (
-          <div className="text-gray-500/60 text-sm text-center py-6 italic font-medium">Henüz yiyecek eklenmedi</div>
+          <div className="text-sm text-center py-6 italic font-medium" style={{ color: 'var(--text-secondary)' }}>Henüz yiyecek eklenmedi</div>
         )}
         {items.map((item) => (
-          <div key={item.id} className="bg-white/70 backdrop-blur-md rounded-xl p-3 flex justify-between items-center group/item shadow-sm hover:shadow-md transition-all hover:scale-[1.02]">
-            <div>
-              <div className="font-semibold text-gray-800 text-sm">{item.name}</div>
-              <div className="text-xs text-gray-500 font-medium">{item.calories} kcal</div>
+          <div
+            key={item.id}
+            className="backdrop-blur-md rounded-2xl p-4 flex justify-between items-center group/item shadow-sm hover:shadow-lg transition-all hover:scale-[1.02] border"
+            style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+          >
+            <div className="flex flex-col">
+              <span className="font-bold text-sm" style={{ color: 'var(--text-primary)' }}>{item.name}</span>
+              <span className="text-[10px] font-bold uppercase tracking-tighter mt-0.5" style={{ color: 'var(--text-secondary)' }}>{item.calories} kcal</span>
             </div>
             <button
               onClick={() => onRemove(item.id)}
-              className="text-gray-400 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-all p-1.5 hover:bg-red-50 rounded-lg"
+              className="text-gray-400 hover:text-red-500 opacity-0 group-hover/item:opacity-100 transition-all p-2 hover:bg-red-500/10 rounded-xl active:scale-90"
               title="Sil"
             >
-              <Trash2 size={14} />
+              <Trash2 size={16} />
             </button>
           </div>
         ))}
@@ -40,10 +48,11 @@ const MealCard = ({ title, items, color, hoverBorder, hoverShadow, totalCalories
 
       <button
         onClick={onAdd}
-        className="w-full py-3 bg-white/60 hover:bg-white text-gray-700 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm hover:shadow group-hover:bg-white/80"
+        className="w-full py-3.5 bg-white/20 dark:bg-white/5 hover:bg-white/40 dark:hover:bg-white/10 rounded-[20px] text-sm font-black flex items-center justify-center gap-2 transition-all shadow-sm group-hover:shadow active:scale-95 border border-white/20"
+        style={{ color: 'var(--text-primary)' }}
       >
-        <Plus size={16} className="text-gray-500 group-hover:text-primary-600 transition-colors" />
-        <span className="group-hover:text-primary-700 transition-colors">Yiyecek Ekle</span>
+        <Plus size={18} className="group-hover:rotate-90 transition-transform duration-300" style={{ color: 'var(--text-secondary)' }} />
+        <span>Yiyecek Ekle</span>
       </button>
     </div>
   );

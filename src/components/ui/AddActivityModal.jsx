@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Activity, Clock, Flame } from 'lucide-react';
+import { X, Plus, Activity, Clock, Flame, ChevronRight } from 'lucide-react';
 
 const AddActivityModal = ({ isOpen, onClose, onSave }) => {
     const [formData, setFormData] = useState({
@@ -9,16 +9,16 @@ const AddActivityModal = ({ isOpen, onClose, onSave }) => {
     });
 
     const activityTypes = [
-        { id: 'run', label: 'Koşu', icon: '🏃‍♂️', defaultCalPerMin: 10 },
-        { id: 'swim', label: 'Yüzme', icon: '🏊‍♂️', defaultCalPerMin: 8 },
-        { id: 'cycle', label: 'Bisiklet', icon: '🚴‍♂️', defaultCalPerMin: 7 },
-        { id: 'football', label: 'Futbol', icon: '⚽', defaultCalPerMin: 9 },
-        { id: 'basketball', label: 'Basketbol', icon: '🏀', defaultCalPerMin: 9 },
-        { id: 'tennis', label: 'Tenis', icon: '🎾', defaultCalPerMin: 8 },
-        { id: 'rope', label: 'İp Atlama', icon: '🤸‍♂️', defaultCalPerMin: 12 },
-        { id: 'walk', label: 'Yürüyüş', icon: '🚶‍♂️', defaultCalPerMin: 4 },
-        { id: 'pushup', label: 'Şınav / Kuvvet', icon: '💪', defaultCalPerMin: 6 },
-        { id: 'yoga', label: 'Yoga', icon: '🧘‍♂️', defaultCalPerMin: 3 },
+        { id: 'run', label: 'Koşu', icon: '🏃‍♂️', defaultCalPerMin: 10, color: 'text-orange-400' },
+        { id: 'swim', label: 'Yüzme', icon: '🏊‍♂️', defaultCalPerMin: 8, color: 'text-blue-400' },
+        { id: 'cycle', label: 'Bisiklet', icon: '🚴‍♂️', defaultCalPerMin: 7, color: 'text-green-400' },
+        { id: 'football', label: 'Futbol', icon: '⚽', defaultCalPerMin: 9, color: 'text-yellow-400' },
+        { id: 'basketball', label: 'Basketbol', icon: '🏀', defaultCalPerMin: 9, color: 'text-orange-500' },
+        { id: 'tennis', label: 'Tenis', icon: '🎾', defaultCalPerMin: 8, color: 'text-lime-400' },
+        { id: 'rope', label: 'İp Atlama', icon: '🤸‍♂️', defaultCalPerMin: 12, color: 'text-pink-400' },
+        { id: 'walk', label: 'Yürüyüş', icon: '🚶‍♂️', defaultCalPerMin: 4, color: 'text-emerald-400' },
+        { id: 'pushup', label: 'Şınav / Kuvvet', icon: '💪', defaultCalPerMin: 6, color: 'text-slate-400' },
+        { id: 'yoga', label: 'Yoga', icon: '🧘‍♂️', defaultCalPerMin: 3, color: 'text-violet-400' },
     ];
 
     const handleChange = (e) => {
@@ -26,21 +26,18 @@ const AddActivityModal = ({ isOpen, onClose, onSave }) => {
         setFormData(prev => {
             const newData = { ...prev, [name]: value };
 
-            // Auto-calculate calories if duration changes
             if (name === 'duration' && value && prev.type) {
                 const typeInfo = activityTypes.find(t => t.label === prev.type);
                 if (typeInfo) {
                     newData.calories = Math.round(value * typeInfo.defaultCalPerMin);
                 }
             }
-            // Auto-calculate calories if type changes (and duration exists)
             if (name === 'type') {
                 const typeInfo = activityTypes.find(t => t.label === value);
                 if (typeInfo && prev.duration) {
                     newData.calories = Math.round(prev.duration * typeInfo.defaultCalPerMin);
                 }
             }
-
             return newData;
         });
     };
@@ -57,7 +54,6 @@ const AddActivityModal = ({ isOpen, onClose, onSave }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         if (formData.type && formData.duration && formData.calories) {
-            // Find icon
             const typeInfo = activityTypes.find(t => t.label === formData.type);
             onSave({
                 ...formData,
@@ -73,82 +69,91 @@ const AddActivityModal = ({ isOpen, onClose, onSave }) => {
     if (!isOpen) return null;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-            <div className="bg-white rounded-3xl shadow-xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-300">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden font-inter">
+            {/* Backdrop with extreme blur */}
+            <div
+                className="absolute inset-0 bg-slate-950/60 backdrop-blur-xl animate-in fade-in duration-300"
+                onClick={onClose}
+            ></div>
+
+            <div className="w-full max-w-md bg-white/[0.03] backdrop-blur-3xl rounded-[40px] border border-white/10 shadow-2xl relative z-10 overflow-hidden animate-in zoom-in-95 duration-300">
+
+                {/* Visual Header Decoration */}
+                <div className="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-orange-500/10 to-transparent pointer-events-none"></div>
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-orange-500 to-red-500 p-6 flex justify-between items-center text-white">
-                    <div className="flex items-center gap-3">
-                        <div className="bg-white/20 p-2 rounded-xl backdrop-blur-md">
-                            <Activity size={24} className="text-white" />
+                <div className="p-8 pb-4 flex justify-between items-start relative z-10">
+                    <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 bg-orange-500/20 rounded-2xl flex items-center justify-center border border-orange-500/30 shadow-lg shadow-orange-500/10">
+                            <Activity className="text-orange-400" size={24} />
                         </div>
                         <div>
-                            <h3 className="text-xl font-bold">Aktivite Ekle</h3>
-                            <p className="text-orange-100 text-xs font-medium">Hareket zamanı!</p>
+                            <h3 className="text-2xl font-black text-white tracking-tight">Antrenman Ekle</h3>
+                            <p className="text-slate-400 text-xs font-bold uppercase tracking-wider">Bugün ne kadar aktiftin?</p>
                         </div>
                     </div>
                     <button
                         onClick={onClose}
-                        className="p-2 hover:bg-white/20 rounded-full transition-colors active:scale-95"
+                        className="w-10 h-10 flex items-center justify-center bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white rounded-full transition-all border border-white/5 active:scale-90"
                     >
                         <X size={20} />
                     </button>
                 </div>
 
                 {/* Body */}
-                <form onSubmit={handleSubmit} className="p-6 space-y-6">
+                <form onSubmit={handleSubmit} className="p-8 pt-4 space-y-8 relative z-10">
 
-                    {/* Quick Select Type */}
-                    <div className="space-y-3">
-                        <label className="text-sm font-semibold text-gray-700 block">Aktivite Türü</label>
-                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                    {/* Activity Type Selection */}
+                    <div className="space-y-4">
+                        <label className="text-sm font-bold text-slate-400 ml-1">Egzersiz Türü</label>
+                        <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-2 px-2 snap-x">
                             {activityTypes.map(type => (
                                 <button
                                     key={type.id}
                                     type="button"
                                     onClick={() => handleTypeSelect(type.label)}
-                                    className={`flex flex-col items-center justify-center p-3 min-w-[80px] rounded-xl border transition-all ${formData.type === type.label
-                                        ? 'bg-orange-50 border-orange-500 text-orange-700 ring-1 ring-orange-200'
-                                        : 'bg-gray-50 border-gray-100 text-gray-500 hover:bg-gray-100'
+                                    className={`flex flex-col items-center justify-center p-4 min-w-[90px] rounded-3xl border transition-all snap-start ${formData.type === type.label
+                                        ? 'bg-orange-500/20 border-orange-500/50 text-white shadow-lg shadow-orange-500/10 active:scale-95'
+                                        : 'bg-white/5 border-white/10 text-slate-500 hover:bg-white/10 hover:border-white/20'
                                         }`}
                                 >
-                                    <span className="text-2xl mb-1">{type.icon}</span>
-                                    <span className="text-xs font-medium whitespace-nowrap">{type.label}</span>
+                                    <span className="text-3xl mb-2">{type.icon}</span>
+                                    <span className="text-[10px] font-black uppercase tracking-tight">{type.label}</span>
                                 </button>
                             ))}
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-2 gap-6">
                         {/* Duration Input */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Süre (Dk)</label>
-                            <div className="relative">
-                                <Clock size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                        <div className="space-y-3">
+                            <label className="text-sm font-bold text-slate-400 ml-1">Süre (Dakika)</label>
+                            <div className="relative group">
+                                <Clock size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-orange-400 transition-colors" />
                                 <input
                                     type="number"
                                     name="duration"
                                     value={formData.duration}
                                     onChange={handleChange}
                                     placeholder="30"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 transition-all font-bold placeholder:text-slate-700"
                                     required
                                 />
                             </div>
                         </div>
 
                         {/* Calories Input */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-gray-700">Yakılan (Kcal)</label>
-                            <div className="relative">
-                                <Flame size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" />
+                        <div className="space-y-3">
+                            <label className="text-sm font-bold text-slate-400 ml-1">Yakılan (Kcal)</label>
+                            <div className="relative group">
+                                <Flame size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-orange-400 transition-colors" />
                                 <input
                                     type="number"
                                     name="calories"
                                     value={formData.calories}
                                     onChange={handleChange}
-                                    placeholder="300"
-                                    className="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-100 outline-none transition-all font-bold text-gray-800"
+                                    placeholder="250"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 transition-all font-bold placeholder:text-slate-700"
                                     required
                                 />
                             </div>
@@ -156,23 +161,22 @@ const AddActivityModal = ({ isOpen, onClose, onSave }) => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex gap-3 pt-2">
+                    <div className="flex flex-col gap-3 pt-4">
+                        <button
+                            type="submit"
+                            className="w-full bg-gradient-to-r from-orange-600 to-orange-500 hover:from-orange-500 hover:to-orange-400 text-white font-black text-sm uppercase tracking-[2px] py-5 rounded-2xl transition-all shadow-xl shadow-orange-600/20 active:scale-[0.98] flex items-center justify-center gap-3"
+                        >
+                            <Plus size={20} className="font-black" />
+                            Aktiviteyi Kaydet
+                        </button>
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 text-gray-500 font-semibold hover:bg-gray-50 rounded-xl transition-colors"
+                            className="w-full py-4 text-slate-500 hover:text-slate-300 font-bold text-xs uppercase tracking-widest transition-colors"
                         >
                             Vazgeç
                         </button>
-                        <button
-                            type="submit"
-                            className="flex-[2] py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-orange-200 active:scale-95 transition-all"
-                        >
-                            <Plus size={20} />
-                            Antrenmanı Kaydet
-                        </button>
                     </div>
-
                 </form>
             </div>
         </div>

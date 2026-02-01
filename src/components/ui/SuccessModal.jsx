@@ -15,18 +15,21 @@ const SuccessModal = ({ isOpen, onClose, title, message }) => {
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-[2px] animate-in fade-in duration-300">
-            <div className="bg-white rounded-3xl shadow-2xl p-8 max-w-sm w-full relative flex flex-col items-center text-center animate-in zoom-in-95 slide-in-from-bottom-5 duration-500">
+            <div
+                className="rounded-3xl shadow-2xl p-8 max-w-sm w-full relative flex flex-col items-center text-center animate-in zoom-in-95 slide-in-from-bottom-5 duration-500 border"
+                style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+            >
 
                 {/* Animated Trophy Icon */}
-                <div className="w-20 h-20 bg-yellow-100 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-lg shadow-yellow-100">
+                <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center mb-6 animate-bounce shadow-lg shadow-yellow-500/10">
                     <Trophy size={40} className="text-yellow-500" />
                 </div>
 
-                <h3 className="text-2xl font-black text-gray-800 mb-2 tracking-tight">
+                <h3 className="text-2xl font-black mb-2 tracking-tight" style={{ color: 'var(--text-primary)' }}>
                     Başardın! 🎉
                 </h3>
 
-                <p className="text-gray-500 font-medium mb-8 leading-relaxed">
+                <p className="font-medium mb-8 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
                     {message}
                 </p>
 

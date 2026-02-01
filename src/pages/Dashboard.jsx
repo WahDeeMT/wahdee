@@ -7,7 +7,7 @@ import MealCard from '../components/ui/MealCard';
 import AddFoodModal from '../components/ui/AddFoodModal';
 import SuccessModal from '../components/ui/SuccessModal';
 
-const Dashboard = ({ userData, stats, onUpdateStats }) => {
+const Dashboard = ({ userData, stats, onUpdateStats, meals, onUpdateMeals }) => {
   // Gamification State
   const [celebratedGoals, setCelebratedGoals] = useState({
     calories: false,
@@ -18,45 +18,6 @@ const Dashboard = ({ userData, stats, onUpdateStats }) => {
   const [successModal, setSuccessModal] = useState({
     isOpen: false,
     message: ''
-  });
-
-  // Meals State (Local)
-  const [meals, setMeals] = useState({
-    breakfast: {
-      title: 'Kahvaltı',
-      color: 'bg-yellow-50',
-      hoverBorder: 'hover:border-yellow-300',
-      hoverShadow: 'hover:shadow-yellow-100',
-      items: [
-        { id: 1, name: 'Yulaf Ezmesi & Meyve', calories: 350 },
-        { id: 2, name: 'Sade Kahve', calories: 5 },
-      ]
-    },
-    lunch: {
-      title: 'Öğle',
-      color: 'bg-green-50',
-      hoverBorder: 'hover:border-green-300',
-      hoverShadow: 'hover:shadow-green-100',
-      items: [
-        { id: 3, name: 'Izgara Tavuk Salata', calories: 450 },
-      ]
-    },
-    snack: {
-      title: 'Ara Öğün',
-      color: 'bg-purple-50',
-      hoverBorder: 'hover:border-purple-300',
-      hoverShadow: 'hover:shadow-purple-100',
-      items: [
-        { id: 4, name: 'Badem (15g)', calories: 95 },
-      ]
-    },
-    dinner: {
-      title: 'Akşam',
-      color: 'bg-pink-50',
-      hoverBorder: 'hover:border-pink-300',
-      hoverShadow: 'hover:shadow-pink-100',
-      items: [],
-    },
   });
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -128,18 +89,19 @@ const Dashboard = ({ userData, stats, onUpdateStats }) => {
   const handleSaveFood = (name, calories) => {
     if (!selectedMealCategory) return;
 
-    const newFood = { id: Date.now(), name, calories };
-
-    setMeals(prev => ({
-      ...prev,
+    const newFood = { id: Date.now(), name, calories: parseInt(calories) };
+    const updatedMeals = {
+      ...meals,
       [selectedMealCategory]: {
-        ...prev[selectedMealCategory],
-        items: [...prev[selectedMealCategory].items, newFood]
+        ...meals[selectedMealCategory],
+        items: [...meals[selectedMealCategory].items, newFood]
       }
-    }));
+    };
+
+    onUpdateMeals(updatedMeals);
 
     // Update global calories
-    handleUpdateCalories(parseInt(calories));
+    handleUpdateCalories(newFood.calories);
     setIsModalOpen(false);
   };
 
@@ -147,13 +109,15 @@ const Dashboard = ({ userData, stats, onUpdateStats }) => {
     const meal = meals[mealType].items.find(i => i.id === id);
     if (!meal) return;
 
-    setMeals(prev => ({
-      ...prev,
+    const updatedMeals = {
+      ...meals,
       [mealType]: {
-        ...prev[mealType],
-        items: prev[mealType].items.filter(i => i.id !== id)
+        ...meals[mealType],
+        items: meals[mealType].items.filter(i => i.id !== id)
       }
-    }));
+    };
+
+    onUpdateMeals(updatedMeals);
 
     // Update global calories
     handleUpdateCalories(-meal.calories);
@@ -240,11 +204,11 @@ const Dashboard = ({ userData, stats, onUpdateStats }) => {
           </div>
         </div>
 
-        <div className="h-px bg-gray-200 w-full my-8" />
+        <div className="h-px w-full my-8" style={{ backgroundColor: 'var(--border-color)' }} />
 
         {/* Meals Grid */}
         <div>
-          <h2 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2 px-1">
+          <h2 className="text-xl font-bold mb-6 flex items-center gap-2 px-1" style={{ color: 'var(--text-primary)' }}>
             Öğünler
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">

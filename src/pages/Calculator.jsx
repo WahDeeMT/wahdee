@@ -8,48 +8,42 @@ const ActivityCard = ({ id, label, description, icon: Icon, isActive, onClick })
         className={cn(
             "relative flex flex-col items-center p-4 rounded-2xl border-2 transition-all duration-300 group",
             isActive
-                ? "border-violet-600 bg-violet-50/50 shadow-md shadow-violet-100"
-                : "border-gray-100 bg-white hover:border-violet-200 hover:bg-violet-50/30"
+                ? "border-violet-500 shadow-md"
+                : "border-transparent hover:bg-violet-500/10"
         )}
+        style={{
+            backgroundColor: isActive ? 'rgba(var(--sidebar-active-rgba))' : 'var(--bg-card)',
+            borderColor: isActive ? 'var(--primary-500)' : 'var(--border-color)'
+        }}
     >
         <div className={cn(
             "w-12 h-12 rounded-xl flex items-center justify-center mb-3 transition-colors",
-            isActive ? "bg-violet-600 text-white" : "bg-gray-100 text-gray-400 group-hover:bg-violet-100 group-hover:text-violet-600"
+            isActive ? "bg-violet-500 text-white" : "bg-white/5 text-gray-400 group-hover:bg-violet-500/20 group-hover:text-violet-500"
         )}>
             <Icon size={24} />
         </div>
-        <span className={cn("text-xs font-bold mb-1", isActive ? "text-violet-700" : "text-gray-600")}>{label}</span>
-        <span className="text-[10px] text-gray-400 text-center leading-tight">{description}</span>
+        <span className={cn("text-xs font-bold mb-1", isActive ? "text-violet-500" : "text-gray-400")} style={{ color: isActive ? '' : 'var(--text-secondary)' }}>{label}</span>
+        <span className="text-[10px] text-center leading-tight" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>{description}</span>
     </button>
 );
 
 const RangeSlider = ({ label, value, min, max, unit, onChange, color = "violet" }) => (
     <div className="space-y-4">
         <div className="flex justify-between items-center">
-            <span className="text-sm font-semibold text-gray-600">{label}</span>
+            <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>{label}</span>
             <div className="flex items-center gap-1">
-                <span className={cn("text-lg font-black", `text-${color}-600`)}>{value}</span>
-                <span className="text-xs font-medium text-gray-400">{unit}</span>
+                <span className={cn("text-lg font-black", `text-${color}-500`)}>{value}</span>
+                <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>{unit}</span>
             </div>
         </div>
-        <div className="relative h-6 flex items-center">
-            <div className="absolute w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                    className={cn("h-full transition-all duration-300", `bg-${color}-600`)}
-                    style={{ width: `${((value - min) / (max - min)) * 100}%` }}
-                />
-            </div>
+        <div className="relative pt-2">
             <input
                 type="range"
                 min={min}
                 max={max}
                 value={value}
                 onChange={(e) => onChange(parseInt(e.target.value))}
-                className="absolute w-full h-1.5 opacity-0 cursor-pointer z-10"
-            />
-            <div
-                className={cn("absolute w-4 h-4 rounded-full border-2 border-white shadow-md transition-all duration-75 pointer-events-none", `bg-${color}-600`)}
-                style={{ left: `calc(${((value - min) / (max - min)) * 100}% - 8px)` }}
+                className={cn("modern-slider", `text-${color}-600`)}
             />
         </div>
     </div>
@@ -106,28 +100,37 @@ const Calculator = ({ userData }) => {
     };
 
     return (
-        <div className="p-6 max-w-5xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <div className="flex flex-col md:flex-row gap-8">
+        <div className="p-6 max-w-6xl mx-auto space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-700">
+            <div className="text-center space-y-3">
+                <div className="inline-flex items-center gap-2 px-4 py-2 bg-violet-500/10 text-violet-500 rounded-full text-sm font-bold border border-violet-500/20 mb-2">
+                    <CalculatorIcon size={16} />
+                    AKILLI HESAPLAYICI
+                </div>
+                <h1 className="text-4xl font-black tracking-tight" style={{ color: 'var(--text-primary)' }}>Kalori ve Makro Hesaplayıcı</h1>
+                <p className="font-medium max-w-xl mx-auto" style={{ color: 'var(--text-secondary)' }}>Vücut yapınıza ve hedeflerinize en uygun kalori ve makrobesin dengesini saniyeler içinde belirleyin.</p>
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 {/* Input Section */}
-                <div className="flex-1 space-y-8">
-                    <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100">
-                        <h2 className="text-2xl font-black text-gray-800 mb-8 flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-violet-600 flex items-center justify-center text-white shadow-lg shadow-violet-200">
-                                <CalculatorIcon size={24} />
+                <div className="lg:col-span-7 space-y-10">
+                    <section className="p-8 rounded-[32px] border shadow-xl space-y-8" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                        <div className="flex items-center gap-3 mb-2">
+                            <div className="p-2 bg-violet-500/10 rounded-lg text-violet-500">
+                                <User size={20} />
                             </div>
-                            Hesaplayıcı
-                        </h2>
+                            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Kişisel Bilgiler</h2>
+                        </div>
 
                         <div className="space-y-10">
                             {/* Gender Selection */}
                             <div className="space-y-4">
-                                <span className="text-sm font-semibold text-gray-600">Cinsiyet</span>
-                                <div className="flex p-1.5 bg-gray-100 rounded-2xl w-full">
+                                <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Cinsiyet</span>
+                                <div className="flex p-1.5 bg-white/5 dark:bg-white/10 rounded-2xl w-full border" style={{ borderColor: 'var(--border-color)' }}>
                                     <button
                                         onClick={() => setGender('male')}
                                         className={cn(
                                             "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300",
-                                            gender === 'male' ? "bg-white text-violet-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                                            gender === 'male' ? "bg-white dark:bg-slate-700 text-violet-500 shadow-sm" : "text-gray-400 hover:text-gray-300"
                                         )}
                                     >
                                         Erkek
@@ -136,10 +139,10 @@ const Calculator = ({ userData }) => {
                                         onClick={() => setGender('female')}
                                         className={cn(
                                             "flex-1 py-3 rounded-xl text-sm font-bold transition-all duration-300",
-                                            gender === 'female' ? "bg-white text-pink-600 shadow-sm" : "text-gray-400 hover:text-gray-600"
+                                            gender === 'female' ? "bg-white dark:bg-slate-700 text-pink-500 shadow-sm" : "text-gray-400 hover:text-gray-300"
                                         )}
                                     >
-                                        Kız
+                                        Kadın
                                     </button>
                                 </div>
                             </div>
@@ -155,7 +158,7 @@ const Calculator = ({ userData }) => {
 
                             {/* Activity Level */}
                             <div className="space-y-4">
-                                <span className="text-sm font-semibold text-gray-600">Aktivite Seviyesi</span>
+                                <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Aktivite Seviyesi</span>
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                                     {activityLevels.map(level => (
                                         <ActivityCard
@@ -170,7 +173,7 @@ const Calculator = ({ userData }) => {
 
                             {/* Goal */}
                             <div className="space-y-4">
-                                <span className="text-sm font-semibold text-gray-600">Hedefiniz</span>
+                                <span className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>Hedefiniz</span>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                     {goals.map(g => (
                                         <button
@@ -179,12 +182,12 @@ const Calculator = ({ userData }) => {
                                             className={cn(
                                                 "p-4 rounded-2xl border-2 transition-all text-left",
                                                 goal === g.id
-                                                    ? "border-emerald-500 bg-emerald-50/50"
-                                                    : "border-gray-100 bg-white hover:border-emerald-200"
+                                                    ? "border-emerald-500 bg-emerald-500/10 shadow-sm"
+                                                    : "border-transparent bg-white/5 hover:bg-emerald-500/5 text-gray-400"
                                             )}
                                         >
-                                            <div className={cn("text-xs font-bold", goal === g.id ? "text-emerald-700" : "text-gray-700")}>{g.label}</div>
-                                            <div className="text-[10px] text-gray-400 mt-1">{g.description}</div>
+                                            <div className={cn("text-xs font-bold", goal === g.id ? "text-emerald-500" : "text-gray-400")} style={{ color: goal === g.id ? '' : 'var(--text-primary)' }}>{g.label}</div>
+                                            <div className="text-[10px] mt-1" style={{ color: 'var(--text-secondary)', opacity: 0.6 }}>{g.description}</div>
                                         </button>
                                     ))}
                                 </div>
@@ -192,89 +195,126 @@ const Calculator = ({ userData }) => {
 
                             <button
                                 onClick={handleCalculate}
-                                className="w-full py-5 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-2xl font-black text-lg shadow-xl shadow-violet-200 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3 group"
+                                className="w-full bg-violet-600 hover:bg-violet-700 text-white py-5 rounded-2xl font-black text-xl transition-all active:scale-95 shadow-xl shadow-violet-500/10 flex items-center justify-center gap-3 group"
                             >
                                 Hesapla
-                                <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                                <ChevronRight size={24} className="group-hover:translate-x-2 transition-transform" />
                             </button>
                         </div>
-                    </div>
+                    </section>
                 </div>
 
                 {/* Results Section */}
-                <div className="w-full md:w-80 space-y-6">
+                <div className="lg:col-span-5">
                     {results ? (
-                        <div className="animate-in fade-in zoom-in-95 duration-500 space-y-6">
-                            <div className="bg-gradient-to-br from-violet-600 to-indigo-700 rounded-3xl p-8 text-white shadow-xl shadow-violet-200">
-                                <span className="text-violet-200 text-xs font-bold uppercase tracking-widest">Günlük Hedef</span>
-                                <div className="text-5xl font-black mt-2 mb-1">{results.targetCalories}</div>
-                                <span className="text-violet-200 text-sm font-medium">kcal / gün</span>
-
-                                <div className="mt-8 grid grid-cols-2 gap-4">
-                                    <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-md">
-                                        <div className="text-[10px] font-bold text-violet-200 uppercase">BMR</div>
-                                        <div className="text-lg font-black">{results.bmr}</div>
+                        <div className="space-y-6 animate-in zoom-in-95 duration-700">
+                            <div className="bg-gradient-to-br from-gray-900 to-black rounded-[40px] p-8 text-white shadow-3xl shadow-violet-200/20 relative overflow-hidden">
+                                <div className="relative z-10">
+                                    <div className="inline-block px-4 py-1.5 bg-violet-600 rounded-full text-xs font-black tracking-widest uppercase mb-6">
+                                        Günlük Hedef
                                     </div>
-                                    <div className="bg-white/10 rounded-2xl p-4 backdrop-blur-md">
-                                        <div className="text-[10px] font-bold text-violet-200 uppercase">TDEE</div>
-                                        <div className="text-lg font-black">{results.tdee}</div>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <div>
+                                            <div className="text-6xl font-black text-violet-400">{results.targetCalories}</div>
+                                            <div className="text-sm font-bold text-gray-400 uppercase tracking-widest mt-1">kcal / gün</div>
+                                        </div>
+                                        <div className="w-24 h-24 relative flex items-center justify-center">
+                                            <div className="absolute inset-0 bg-violet-600/20 rounded-full animate-ping" />
+                                            <div className="absolute inset-2 bg-violet-600/30 rounded-full animate-pulse" />
+                                            <div className="relative z-10 w-16 h-16 bg-gradient-to-tr from-violet-600 to-violet-400 rounded-full flex items-center justify-center shadow-lg border-2 border-white/20">
+                                                <Zap size={24} className="text-white" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="mt-8 grid grid-cols-2 gap-4">
+                                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">BMR</div>
+                                            <div className="text-xl font-black">{results.bmr}</div>
+                                        </div>
+                                        <div className="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                                            <div className="text-[10px] font-bold text-gray-400 uppercase mb-1">TDEE</div>
+                                            <div className="text-xl font-black">{results.tdee}</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <div className="bg-white rounded-3xl p-8 shadow-xl shadow-gray-200/50 border border-gray-100 space-y-6">
-                                <h3 className="text-lg font-bold text-gray-800">Makro Besinler</h3>
+                            <div className="p-8 rounded-[32px] shadow-xl border space-y-8" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-violet-500/10 rounded-lg text-violet-500">
+                                        <Activity size={20} />
+                                    </div>
+                                    <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Makro Besinler</h3>
+                                </div>
 
-                                <div className="space-y-5">
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-bold">
-                                            <span className="text-blue-600">Protein</span>
-                                            <span className="text-gray-500">{results.macros.protein}g</span>
+                                <div className="space-y-6">
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Protein</span>
+                                                <p className="text-[10px] font-bold uppercase mt-0.5" style={{ color: 'var(--text-secondary)' }}>Kas Onarımı</p>
+                                            </div>
+                                            <span className="text-lg font-black text-blue-500">{results.macros.protein}g</span>
                                         </div>
-                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-blue-500 w-[30%]" />
+                                        <div className="premium-progress">
+                                            <div className="premium-progress-bar bg-blue-500" style={{ width: '30%' }}>
+                                                <div className="premium-progress-shimmer" />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-bold">
-                                            <span className="text-emerald-600">Karbonhidrat</span>
-                                            <span className="text-gray-500">{results.macros.carbs}g</span>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Karbonhidrat</span>
+                                                <p className="text-[10px] font-bold uppercase mt-0.5" style={{ color: 'var(--text-secondary)' }}>Enerji Kaynağı</p>
+                                            </div>
+                                            <span className="text-lg font-black text-emerald-500">{results.macros.carbs}g</span>
                                         </div>
-                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-emerald-500 w-[40%]" />
+                                        <div className="premium-progress">
+                                            <div className="premium-progress-bar bg-emerald-500" style={{ width: '40%' }}>
+                                                <div className="premium-progress-shimmer" />
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between text-xs font-bold">
-                                            <span className="text-amber-600">Yağ</span>
-                                            <span className="text-gray-500">{results.macros.fat}g</span>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between items-end">
+                                            <div>
+                                                <span className="text-sm font-bold" style={{ color: 'var(--text-primary)' }}>Yağ</span>
+                                                <p className="text-[10px] font-bold uppercase mt-0.5" style={{ color: 'var(--text-secondary)' }}>Hormon Dengesi</p>
+                                            </div>
+                                            <span className="text-lg font-black text-amber-500">{results.macros.fat}g</span>
                                         </div>
-                                        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                                            <div className="h-full bg-amber-500 w-[30%]" />
+                                        <div className="premium-progress">
+                                            <div className="premium-progress-bar bg-amber-500" style={{ width: '30%' }}>
+                                                <div className="premium-progress-shimmer" />
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <div className="pt-4 border-t border-gray-100">
-                                    <div className="flex items-start gap-3 p-4 bg-gray-50 rounded-2xl">
-                                        <Info size={16} className="text-gray-400 shrink-0 mt-0.5" />
-                                        <p className="text-[10px] text-gray-400 leading-relaxed">
-                                            Bu değerler genel yaklaşımlardır. %30 Protein, %40 Karbonhidrat ve %30 Yağ oranına göre hesaplanmıştır.
+                                <div className="pt-6 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                                    <div className="flex items-start gap-4 p-4 rounded-2xl border" style={{ backgroundColor: 'rgba(var(--sidebar-active-rgba))', borderColor: 'var(--border-color)' }}>
+                                        <div className="w-10 h-10 rounded-xl bg-violet-500/10 flex items-center justify-center text-violet-500 shrink-0">
+                                            <Info size={20} />
+                                        </div>
+                                        <p className="text-xs leading-relaxed font-medium" style={{ color: 'var(--text-secondary)' }}>
+                                            Bu değerler genel yaklaşımlardır. <span className="font-bold" style={{ color: 'var(--text-primary)' }}>%30 Protein, %40 Karbonhidrat</span> ve <span className="font-bold" style={{ color: 'var(--text-primary)' }}>%30 Yağ</span> oranına göre hesaplanmıştır.
                                         </p>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     ) : (
-                        <div className="bg-gray-50 rounded-3xl p-8 border-2 border-dashed border-gray-200 h-full flex flex-col items-center justify-center text-center space-y-4">
-                            <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center text-gray-300">
-                                <CalculatorIcon size={32} />
+                        <div className="rounded-[40px] p-12 border-4 border-dashed h-full flex flex-col items-center justify-center text-center space-y-6" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                            <div className="w-24 h-24 rounded-full flex items-center justify-center text-gray-300 shadow-inner" style={{ backgroundColor: 'rgba(var(--sidebar-active-rgba))' }}>
+                                <CalculatorIcon size={48} className="opacity-20" />
                             </div>
-                            <div>
-                                <h3 className="text-sm font-bold text-gray-400">Henüz Hesaplama Yapılmadı</h3>
-                                <p className="text-xs text-gray-300 mt-1">Bilgilerinizi girip hesapla butonuna tıklayın.</p>
+                            <div className="space-y-2">
+                                <h3 className="text-xl font-bold" style={{ color: 'var(--text-secondary)' }}>Henüz Hesaplama Yapılmadı</h3>
+                                <p className="text-sm max-w-[200px] mx-auto opacity-50" style={{ color: 'var(--text-secondary)' }}>Bilgilerinizi girip hesapla butonuna tıklayarak sonuçları görebilirsiniz.</p>
                             </div>
                         </div>
                     )}

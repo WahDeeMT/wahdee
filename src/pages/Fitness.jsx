@@ -3,7 +3,7 @@ import { Play, Clock, Flame, Plus, Calendar, ChevronRight, Trophy } from 'lucide
 import AddActivityModal from '../components/ui/AddActivityModal';
 import ActivityDetailModal from '../components/ui/ActivityDetailModal';
 
-const Fitness = ({ userData }) => {
+const Fitness = ({ userData, stats, onUpdateStats, addNotification }) => {
     const [activities, setActivities] = useState([
         { id: 1, type: 'Koşu', icon: '🏃‍♂️', duration: 30, calories: 320, date: 'Bugün, 08:30' },
         { id: 2, type: 'Şınav / Kuvvet', icon: '💪', duration: 15, calories: 120, date: 'Bugün, 09:15' },
@@ -24,9 +24,37 @@ const Fitness = ({ userData }) => {
             date: `Bugün, ${new Date().toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}`
         };
         setActivities(prev => [activity, ...prev]);
+
+        // Sync with Global Stats
+        if (onUpdateStats && stats) {
+            onUpdateStats({
+                calories: {
+                    ...stats.calories,
+                    burned: (stats.calories.burned || 0) + activity.calories,
+                    totalBurned: (stats.calories.totalBurned || 0) + activity.calories
+                }
+            });
+        }
+
+        // Trigger Notification
+        if (addNotification) {
+            addNotification(`Harika! ${activity.type} tamamlandı, bugün bu aktiviteler yapıldı! 🔥`);
+        }
     };
 
     const handleDeleteActivity = (id) => {
+        const activityToDelete = activities.find(a => a.id === id);
+
+        if (activityToDelete && onUpdateStats && stats) {
+            onUpdateStats({
+                calories: {
+                    ...stats.calories,
+                    burned: Math.max(0, (stats.calories.burned || 0) - activityToDelete.calories),
+                    totalBurned: Math.max(0, (stats.calories.totalBurned || 0) - activityToDelete.calories)
+                }
+            });
+        }
+
         setActivities(prev => prev.filter(a => a.id !== id));
         setSelectedActivity(null);
     };
@@ -37,16 +65,18 @@ const Fitness = ({ userData }) => {
             {/* Header Section */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-gray-800 tracking-tight flex items-center gap-2">
-                        <span className="bg-orange-100 p-2 rounded-xl">🏋️</span>
+                    <h1 className="text-3xl font-black tracking-tight flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
+                        <div className="bg-orange-500/10 p-3 rounded-2xl shadow-sm border" style={{ borderColor: 'var(--border-color)' }}>
+                            <span className="text-2xl">🏋️</span>
+                        </div>
                         Fitness & Antrenman
                     </h1>
-                    <p className="text-gray-500 font-medium ml-1">Hareket takibi ve aktivite geçmişi</p>
+                    <p className="font-medium ml-1 mt-1" style={{ color: 'var(--text-secondary)' }}>Hareket takibi ve aktivite geçmişi</p>
                 </div>
 
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="group flex items-center gap-2 bg-gray-900 hover:bg-black text-white px-5 py-3 rounded-xl font-bold shadow-lg shadow-gray-200 transition-all active:scale-95"
+                    className="group flex items-center gap-2 bg-gradient-to-r from-violet-600 to-indigo-700 hover:from-violet-700 hover:to-indigo-800 text-white px-6 py-3.5 rounded-2xl font-bold shadow-lg shadow-violet-500/20 transition-all active:scale-95 border border-white/10"
                 >
                     <Plus size={20} className="group-hover:rotate-90 transition-transform duration-300" />
                     Aktivite Ekle
@@ -54,103 +84,118 @@ const Fitness = ({ userData }) => {
             </div>
 
             {/* Stats Cards Row */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
                 {/* Total Activity */}
-                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl hover:shadow-blue-100/50 hover:border-blue-200 transition-all duration-300 hover:-translate-y-1">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Play size={100} className="text-blue-600" />
+                <div
+                    className="p-8 rounded-[32px] border relative overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+                >
+                    <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Play size={140} className="text-blue-600" />
                     </div>
-                    <div className="relative">
-                        <div className="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 mb-4 group-hover:scale-110 transition-transform">
-                            <Play fill="currentColor" size={24} />
+                    <div className="relative z-10">
+                        <div className="w-14 h-14 bg-blue-500/10 rounded-2xl flex items-center justify-center text-blue-600 mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border border-blue-100/20">
+                            <Play fill="currentColor" size={28} />
                         </div>
-                        <p className="text-gray-500 font-medium text-sm">Toplam Aktivite</p>
-                        <h3 className="text-4xl font-black text-gray-800 mt-1">
-                            {totalCount} <span className="text-lg text-gray-400 font-semibold">adet</span>
+                        <p className="font-black text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Toplam Aktivite</p>
+                        <h3 className="text-4xl font-black mt-2" style={{ color: 'var(--text-primary)' }}>
+                            {totalCount} <span className="text-lg font-bold" style={{ color: 'var(--text-secondary)' }}>adet</span>
                         </h3>
                     </div>
                 </div>
 
                 {/* Total Duration */}
-                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl hover:shadow-purple-100/50 hover:border-purple-200 transition-all duration-300 hover:-translate-y-1">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Clock size={100} className="text-purple-600" />
+                <div
+                    className="p-8 rounded-[32px] border relative overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+                >
+                    <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Clock size={140} className="text-purple-600" />
                     </div>
-                    <div className="relative">
-                        <div className="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center text-purple-600 mb-4 group-hover:scale-110 transition-transform">
-                            <Clock size={24} />
+                    <div className="relative z-10">
+                        <div className="w-14 h-14 bg-purple-500/10 rounded-2xl flex items-center justify-center text-purple-600 mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border border-purple-100/20">
+                            <Clock size={28} />
                         </div>
-                        <p className="text-gray-500 font-medium text-sm">Toplam Süre</p>
-                        <h3 className="text-4xl font-black text-gray-800 mt-1">
-                            {totalDuration} <span className="text-lg text-gray-400 font-semibold">dk</span>
+                        <p className="font-black text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Toplam Süre</p>
+                        <h3 className="text-4xl font-black mt-2" style={{ color: 'var(--text-primary)' }}>
+                            {totalDuration} <span className="text-lg font-bold" style={{ color: 'var(--text-secondary)' }}>dk</span>
                         </h3>
                     </div>
                 </div>
 
                 {/* Total Calories */}
-                <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group hover:shadow-xl hover:shadow-orange-100/50 hover:border-orange-200 transition-all duration-300 hover:-translate-y-1">
-                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-                        <Flame size={100} className="text-orange-600" />
+                <div
+                    className="p-8 rounded-[32px] border relative overflow-hidden group hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                    style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
+                >
+                    <div className="absolute -top-4 -right-4 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                        <Flame size={140} className="text-orange-600" />
                     </div>
-                    <div className="relative">
-                        <div className="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-4 group-hover:scale-110 transition-transform">
-                            <Flame fill="currentColor" size={24} />
+                    <div className="relative z-10">
+                        <div className="w-14 h-14 bg-orange-500/10 rounded-2xl flex items-center justify-center text-orange-600 mb-6 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 border border-orange-100/20">
+                            <Flame fill="currentColor" size={28} />
                         </div>
-                        <p className="text-gray-500 font-medium text-sm">Yakılan Kalori</p>
-                        <h3 className="text-4xl font-black text-gray-800 mt-1">
-                            {totalCalories} <span className="text-lg text-gray-400 font-semibold">kcal</span>
+                        <p className="font-black text-[10px] uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Yakılan Kalori</p>
+                        <h3 className="text-4xl font-black mt-2" style={{ color: 'var(--text-primary)' }}>
+                            {totalCalories} <span className="text-lg font-bold" style={{ color: 'var(--text-secondary)' }}>kcal</span>
                         </h3>
                     </div>
                 </div>
             </div>
 
             {/* Activity List Section */}
-            <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-                <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
-                    <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
-                        <Calendar size={20} className="text-gray-500" />
+            <div className="rounded-[32px] border overflow-hidden" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                <div className="p-8 border-b flex items-center justify-between" style={{ backgroundColor: 'var(--bg-page)', borderColor: 'var(--border-color)' }}>
+                    <h2 className="text-xl font-black flex items-center gap-3" style={{ color: 'var(--text-primary)' }}>
+                        <div className="p-2 rounded-xl border transition-colors" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+                            <Calendar size={20} style={{ color: 'var(--text-secondary)' }} />
+                        </div>
                         Yapılan Aktiviteler
                     </h2>
-                    <span className="text-sm font-semibold text-gray-400 bg-gray-100 px-3 py-1 rounded-lg">Bugün</span>
+                    <span className="text-[10px] font-black bg-white/10 px-4 py-1.5 rounded-full uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Bugün</span>
                 </div>
 
-                <div className="divide-y divide-gray-100">
+                <div className="p-4 divide-y" style={{ borderColor: 'var(--border-color)' }}>
                     {activities.length > 0 ? (
                         activities.map((activity) => (
                             <div
                                 key={activity.id}
                                 onClick={() => setSelectedActivity(activity)}
-                                className="p-5 flex items-center gap-4 hover:bg-gray-50 transition-colors group cursor-pointer"
+                                className="p-5 flex items-center gap-5 hover:bg-gray-50/80 rounded-[24px] transition-all group cursor-pointer hover:scale-[1.01] active:scale-[0.99] border border-transparent hover:border-gray-100 hover:shadow-lg hover:shadow-gray-200/20"
                             >
-                                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center text-2xl shadow-inner group-hover:scale-105 transition-transform duration-300 group-hover:bg-white group-hover:shadow-md">
+                                <div className="backdrop-blur-md rounded-2xl flex items-center justify-center text-3xl shadow-sm border group-hover:scale-110 transition-transform duration-500 group-hover:rotate-3 group-hover:shadow-md" style={{ backgroundColor: 'var(--bg-card)', borderColor: 'var(--border-color)', width: '4rem', height: '4rem' }}>
                                     {activity.icon}
                                 </div>
 
                                 <div className="flex-1">
-                                    <h4 className="font-bold text-gray-800 text-lg">{activity.type}</h4>
-                                    <p className="text-gray-400 text-sm font-medium flex items-center gap-2">
-                                        <Clock size={14} /> {activity.date}
+                                    <h4 className="font-black text-lg leading-tight" style={{ color: 'var(--text-primary)' }}>{activity.type}</h4>
+                                    <p className="text-xs font-bold flex items-center gap-1.5 mt-1" style={{ color: 'var(--text-secondary)' }}>
+                                        <Clock size={12} /> {activity.date}
                                     </p>
                                 </div>
 
-                                <div className="flex items-center gap-6">
+                                <div className="flex items-center gap-8">
                                     <div className="text-right">
-                                        <span className="block font-bold text-gray-800">{activity.duration} dk</span>
-                                        <span className="text-xs text-gray-400 font-medium">Süre</span>
+                                        <span className="block font-black" style={{ color: 'var(--text-primary)' }}>{activity.duration} dk</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Süre</span>
                                     </div>
                                     <div className="text-right">
-                                        <span className="block font-bold text-orange-500">-{activity.calories} kcal</span>
-                                        <span className="text-xs text-gray-400 font-medium">Yakılan</span>
+                                        <span className="block font-black text-orange-500">-{activity.calories} kcal</span>
+                                        <span className="text-[10px] font-black uppercase tracking-widest" style={{ color: 'var(--text-secondary)' }}>Yakılan</span>
                                     </div>
-                                    <ChevronRight size={20} className="text-gray-300 group-hover:text-gray-600 transition-colors" />
+                                    <div className="w-10 h-10 rounded-full flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                                        <ChevronRight size={20} className="text-gray-400 group-hover:text-primary-500 transition-all group-hover:translate-x-1" />
+                                    </div>
                                 </div>
                             </div>
                         ))
                     ) : (
-                        <div className="p-12 text-center text-gray-400 flex flex-col items-center">
-                            <Trophy size={48} className="mb-4 text-gray-200" />
-                            <p className="font-medium">Henüz bir aktivite kaydı yok.</p>
-                            <p className="text-sm">Harekete geç ve sağlıklı kal!</p>
+                        <div className="p-16 text-center text-gray-400 flex flex-col items-center">
+                            <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mb-6">
+                                <Trophy size={48} className="text-gray-200" />
+                            </div>
+                            <p className="font-black text-gray-500">Henüz bir aktivite kaydı yok.</p>
+                            <p className="text-sm font-medium text-gray-400 mt-1">Harekete geç ve sağlıklı kal!</p>
                         </div>
                     )}
                 </div>

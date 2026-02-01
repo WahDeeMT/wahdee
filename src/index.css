@@ -1,12 +1,37 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
+:root {
+  --bg-page: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-sidebar: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #64748b;
+  --border-color: #e2e8f0;
+  --sidebar-active-rgba: 248, 250, 252;
+  /* gray-50 equivalent */
+}
+
+.dark {
+  --bg-page: #0f172a;
+  --bg-card: #1e293b;
+  --bg-sidebar: #0b1120;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --border-color: rgba(226, 232, 240, 0.1);
+  --sidebar-active-rgba: 139, 92, 246, 0.2;
+  /* primary-500 with opacity */
+}
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   body {
-    @apply font-sans bg-gray-50 text-gray-900 antialiased;
+    @apply font-sans antialiased transition-colors duration-300;
+    background-color: var(--bg-page);
+    color: var(--text-primary);
   }
 }
 
@@ -49,9 +74,17 @@
 }
 
 @keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
   100% {
     transform: translateX(100%);
   }
+}
+
+.animate-shimmer {
+  animation: shimmer 2.5s infinite linear;
 }
 
 @keyframes blob-float {
@@ -82,4 +115,49 @@
 
 .animation-delay-4000 {
   animation-delay: 4s;
+}
+
+@layer components {
+  .premium-progress {
+    @apply h-3 rounded-full overflow-hidden relative border shadow-inner;
+    background-color: var(--border-color);
+    border-color: var(--border-color);
+  }
+
+  .premium-progress-bar {
+    @apply h-full rounded-full transition-all duration-1000 ease-out relative overflow-hidden;
+  }
+
+  .premium-progress-shimmer {
+    @apply absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shimmer;
+  }
+
+  .modern-slider {
+    @apply w-full h-2 rounded-full appearance-none cursor-pointer transition-all;
+    background-color: var(--border-color);
+  }
+
+  /* Webkit (Chrome, Safari, Edge) */
+  .modern-slider::-webkit-slider-runnable-track {
+    @apply h-2 rounded-full;
+    background-color: var(--border-color);
+  }
+
+  .modern-slider::-webkit-slider-thumb {
+    @apply appearance-none w-6 h-6 bg-white border-4 rounded-full shadow-md transition-all active:scale-125 hover:shadow-lg;
+    margin-top: -8px;
+    border-color: currentColor;
+  }
+
+  /* Firefox */
+  .modern-slider::-moz-range-track {
+    @apply h-2 rounded-full;
+    background-color: var(--border-color);
+  }
+
+  .modern-slider::-moz-range-thumb {
+    @apply w-6 h-6 bg-white border-4 rounded-full shadow-md transition-all active:scale-125 hover:shadow-lg;
+    border-color: currentColor;
+  }
+
 }
